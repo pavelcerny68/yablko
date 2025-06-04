@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+<title>Rezervační systém Ezo-eshopu</title>
+<style>
+  body {
+  background-color: #1e1e1e;
+  color: orange;
+  font-family: sans-serif;
+  padding: 20px;
+  }
+
+  /* PŘIDÁNO: Kontejner tlačítek */
+  #tlacitka {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+  }
+
+  /* PŘIDÁNO: Tlačítka v kontejneru */
+  #tlacitka button {
+  flex: 1;
+  min-width: 130px;
+  max-width: 150px;
+  /* Maximální šířka pro větší obrazovky */
+  width: auto !important;
+  /* Přepíše původní width: 100% */
+  display: inline-block !important;
+  /* Přepíše display: block */
+  }
+  .kontejner {
+  margin-bottom: 40px;
+  }
+
+  input,
+  textarea,
+  select,
+  button {
+  display: block;
+  margin-top: 10px;
+  margin-bottom: 20px;
+  padding: 10px;
+  width: 100%;
+  }
+
+  #nahled {
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+  margin-top: 10px;
+  }
+
+  textarea,
+  input[type="text"],
+  input[type="date"],
+  select {
+  background-color: #333333;
+  color: #ffa500;
+  border: 1px solid #ff8c00;
+  border-radius: 5px;
+  padding: 10px;
+  font-family: sans-serif;
+  outline: none;
+  box-sizing: border-box;
+  }
+
+  input:focus,
+  select:focus,
+  textarea:focus {
+  border-color: #ffb732;
+  background-color: #444444;
+  color: #fff3cd;
+  }
+
+  button {
+  background-color: #ffb732;
+  color: #maroon;
+  border: none;
+  border-radius: 6px;
+  padding: 12px 20px;
+  font-weight: bold;
+  cursor: pointer;
+  transition:
+  background-color 0.3s ease,
+  box-shadow 0.3s ease;
+  box-shadow: 0 2px 5px rgba(255, 127, 0, 0.5);
+  }
+
+  button:hover {
+  background-color: #ffa500;
+  box-shadow: 0 4px 12px rgba(255, 165, 0, 0.7);
+  }
+
+  button:active {
+  background-color: #f065;
+  box-shadow: none;
+  }
+
+  .modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  }
+
+  .modal-content {
+  background-color: #333;
+  color: #ffb347;
+  border: 1px solid #ff8c00;
+  border-radius: 10px;
+  max-width: 800px;
+  width: 90%;
+  padding: 20px;
+  position: relative;
+  box-shadow: 0 0 20px rgba(255, 140, 0, 0.5);
+  max-height: 90vh;
+  overflow-y: auto;
+  font-size: 18px;
+  }
+
+  .close-btn {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  color: gold;
+  font-size: 20px;
+  cursor: pointer;
+  }
+
+  .special-btn {
+  background-color: maroon;
+  color: white;
+  font-weight: bold;
+  box-shadow: 0 0 10px orange;
+  }
+
+</style>
+</head>
+<body>
+<h2>OTÁZKY, KTERÉ SLOUŽÍ NA INSPIRACI K PTANÍ SE NA DIAGNOSTIKU</h2>
+
+<!-- 🔘 13 TLAČÍTEK -->
+<div id="tlacitka">
+
+
+<button class="special-btn" onclick="openModal('O-MNE')">O-MNĚ</button>
+<button onclick="openModal('EZOTERIK')">EZOTERIK</button>
+<button onclick="openModal('LOTERIE')">LOTERIE</button>
+<button onclick="openModal('SEBEREFLEXE')">SEBEREFLEXE</button>
+<button onclick="openModal('SEZNAMENI')">SEZNÁMENÍ</button>
+<button onclick="openModal('SPANEK')">SPÁNEK</button>
+<button onclick="openModal('STRACHY')">STRACHY</button>
+<button onclick="openModal('UMENIZIT')">UMĚNÍ ŽÍT</button>
+<button onclick="openModal('VLOHY')">VLOHY</button>
+<button onclick="openModal('VZTAHY')">VZTAHY</button>
+<button onclick="openModal('ZDRAVI')">TĚLO A DUŠE</button>
+<button onclick="openModal('PRACEPENIZE')">PRÁCEPENÍZE</button>
+<button onclick="openModal('CHARAKTER')">CHARAKTER</button>
+</div>
+
+<!-- 🌀 UNIVERZÁLNÍ MODÁL -->
+<div
+id="customModal"
+class="modal-backdrop"
+style="display: none"
+onclick="closeModal(event)"
+>
+<div class="modal-content" onclick="event.stopPropagation()">
+<span class="close-btn" onclick="closeModal()">✖</span>
+<div id="modalHtmlContent">
+Načítání obsahu...
+</div>
+</div>
+</div>
+
+<hr />
+<br /><br /><br />
+
+<div class="kontejner" id="kontejner1">
+<h2>OBJEDNÁVKOVÝ SYSTÉM EZO-ESHOPU</h2>
+<input
+type="text"
+id="telefon"
+maxlength="9"
+placeholder="Zadej telefon (9 číslic)"
+/>
+<input type="date" id="datum" />
+<select id="cas"></select>
+<input type="file" id="fotka" accept="image/*" />
+<img id="nahled" />
+<textarea
+id="poznamka1"
+placeholder="Dotaz klienta na diagnostiku.."
+></textarea>
+<button onclick="ulozitData()">Uložit</button>
+<button onclick="resetFormular()">Reset</button>
+</div>
+
+<div class="kontejner" id="kontejner2">
+<h2 style="color: gold">Kontrola odpovědi</h2>
+<input
+type="text"
+id="kontrolaTel"
+placeholder="Zadej telefon pro kontrolu"
+/>
+<button onclick="nacistData()">Načíst údaje</button>
+<div id="vystup"></div>
+<button onclick="resetFormular()">Reset</button>
+</div>
+
+<script>
+function openModal(name) {
+const modal = document.getElementById("customModal");
+const contentDiv = document.getElementById("modalHtmlContent");
+contentDiv.innerHTML =
+'<p style="color: orange; text-align: center;">🌀 Načítám...</p>';
+
+// Přidáno logování pro debug
+console.log("Otevírám:", name);
+
+fetch(`./modaly/${name}.html`)
+.then(response => {
+if (!response.ok) {
+throw new Error(
+`HTTP error! status: ${response.status}`
+);
+}
+return response.text();
+})
+.then(html => {
+contentDiv.innerHTML = html;
+modal.style.display = "flex";
+})
+.catch(error => {
+console.error("Chyba při načítání:", error);
+contentDiv.innerHTML = `
+<div style="color: red; text-align: center; padding: 50px;">
+<h3>Chyba při načítání obsahu</h3>
+<p>${error.message}</p>
+<p>Soubor: modaly/${name}.html</p>
+</div>
+`;
+modal.style.display = "flex";
+});
+}
+
+function closeModal(event) {
+if (
+event &&
+event.target.classList.contains("modal-backdrop")
+) {
+document.getElementById("customModal").style.display =
+"none";
+} else if (!event) {
+document.getElementById("customModal").style.display =
+"none";
+}
+}
+
+window.onload = () => {
+const dnes = new Date().toISOString().split("T")[0];
+document.getElementById("datum").min = dnes;
+document.getElementById("datum").value = dnes;
+
+const vyberCas = document.getElementById("cas");
+for (let hod = 10; hod <= 20; hod++) {
+let nabidka = document.createElement("option");
+nabidka.value = `${hod}:00`;
+nabidka.text = `${hod}:00`;
+vyberCas.add(nabidka);
+}
+
+document
+.getElementById("fotka")
+.addEventListener("change", function () {
+const soubor = this.files[0];
+if (soubor) {
+const nacteniDat = new FileReader();
+nacteniDat.onload = e => {
+document.getElementById("nahled").src =
+e.target.result;
+};
+nacteniDat.readAsDataURL(soubor);
+}
+});
+};
+
+function ulozitData() {
+const telefon = document.getElementById("telefon").value;
+const datum = document.getElementById("datum").value;
+const cas = document.getElementById("cas").value;
+const poznamka1 = document.getElementById("poznamka1").value;
+const fotka = document.getElementById("fotka").files[0];
+
+if (telefon.length !== 9 || isNaN(telefon)) {
+alert("Telefon musí obsahovat přesně 9 číslic.");
+return;
+}
+
+const nacteniDat = new FileReader();
+nacteniDat.onload = function () {
+const zasifrovatFoto = nacteniDat.result;
+const xml = `<?xml version="1.0"?>
+<klient>
+<telefon>${telefon}</telefon>
+<datum>${datum}</datum>
+<cas>${cas}</cas>
+<fotka>${zasifrovatFoto}</fotka>
+<poznamka1>${poznamka1}</poznamka1>
+<poznamka2></poznamka2>
+</klient>`;
+
+const blob = new Blob([xml], { type: "application/xml" });
+const link = document.createElement("a");
+link.href = URL.createObjectURL(blob);
+link.download = `rezervace_${telefon}.xml`;
+link.click();
+
+resetFormular();
+};
+
+if (fotka) {
+nacteniDat.readAsDataURL(fotka);
+} else {
+nacteniDat.onload({ target: { result: "" } });
+}
+}
+
+function nacistData() {
+const vstup = document.createElement("input");
+vstup.type = "file";
+vstup.accept = ".xml";
+vstup.onchange = e => {
+const soubor = e.target.files[0];
+if (!soubor) return;
+
+const nacteniDat = new FileReader();
+nacteniDat.onload = function () {
+const xmlDoc = new DOMParser().parseFromString(
+nacteniDat.result,
+"application/xml"
+);
+
+const ulozenyTel =
+xmlDoc.getElementsByTagName("telefon")[0]
+.textContent;
+const zadanyTel =
+document.getElementById("kontrolaTel").value;
+
+if (
+zadanyTel === ulozenyTel ||
+zadanyTel === "000000000"
+) {
+const datum =
+xmlDoc.getElementsByTagName("datum")[0]
+.textContent;
+const cas =
+xmlDoc.getElementsByTagName("cas")[0]
+.textContent;
+const fotka =
+xmlDoc.getElementsByTagName("fotka")[0]
+.textContent;
+const poznamka1 =
+xmlDoc.getElementsByTagName("poznamka1")[0]
+.textContent;
+const poznamka2 =
+xmlDoc.getElementsByTagName("poznamka2")[0]
+.textContent;
+
+let novyVystup = `<p><b>Telefon:</b> ${ulozenyTel}</p>`;
+novyVystup += `<p><b>Datum:</b> ${datum}</p>`;
+novyVystup += `<p><b>Čas:</b> ${cas}</p>`;
+novyVystup += `<p><b>Poznámka klienta:</b> ${poznamka1}</p>`;
+novyVystup += `<p><b>Fotka:</b><br><img src="${fotka}" width="200"></p>`;
+
+if (zadanyTel === "000000000") {
+novyVystup += `<p><b>Poznámka terapeuta:</b><textarea id='poznamka2edit'>${poznamka2}</textarea><br><button onclick='ulozPoznamku2()'>Uložit poznámku</button></p>`;
+} else {
+novyVystup += `<p><b>Poznámka terapeuta:</b> ${poznamka2}</p>`;
+}
+document.getElementById("vystup").innerHTML =
+novyVystup;
+} else {
+alert("Špatné heslo nebo telefon.");
+}
+};
+nacteniDat.readAsText(soubor);
+};
+vstup.click();
+}
+
+function ulozPoznamku2() {
+const novyVystup = document.getElementById("vystup").innerHTML;
+const getText = label => {
+const regex = new RegExp(`<b>${label}:</b>\\s*(.*?)<`, "i");
+const match = novyVystup.match(regex);
+return match ? match[1]: "";
+};
+
+const telefon = getText("Telefon");
+const datum = getText("Datum");
+const cas = getText("Čas");
+const poznamka1 = getText("Poznámka klienta");
+const poznamka2nova =
+document.getElementById("poznamka2edit").value;
+const shodaFotky = novyVystup.match(/<img src=\"(.*?)\"/);
+const fotka = shodaFotky ? shodaFotky[1]: "";
+
+const xml = `<?xml version="1.0"?>
+<klient>
+<telefon>${telefon}</telefon>
+<datum>${datum}</datum>
+<cas>${cas}</cas>
+<fotka>${fotka}</fotka>
+<poznamka1>${poznamka1}</poznamka1>
+<poznamka2>${poznamka2nova}</poznamka2>
+</klient>`;
+
+const blob = new Blob([xml], { type: "application/xml" });
+const link = document.createElement("a");
+link.href = URL.createObjectURL(blob);
+link.download = `rezervace_${telefon}_odpoved_ezoshopu.xml`;
+link.click();
+
+alert("Poznámka terapeuta byla upravena a nový soubor uložen.");
+}
+
+function resetFormular() {
+document.getElementById("telefon").value = "";
+document.getElementById("datum").value = new Date()
+.toISOString()
+.split("T")[0];
+document.getElementById("cas").selectedIndex = 0;
+document.getElementById("fotka").value = "";
+document.getElementById("poznamka1").value = "";
+document.getElementById("nahled").src = "";
+document.getElementById("kontrolaTel").value = "";
+document.getElementById("vystup").innerHTML = "";
+}
+</script>
+</body>
+</html>
